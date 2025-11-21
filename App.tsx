@@ -56,8 +56,9 @@ function App() {
       setCurrentPlan(data);
       setCurrentPlanId(newId);
       setView(ViewState.RESULT);
-    } catch (error) {
-      alert("生成行程时出现问题，请检查网络或重试。");
+    } catch (error: any) {
+      console.error(error);
+      alert(`生成行程时出现问题: ${error.message || "请检查网络或重试"}`);
       setView(ViewState.FORM);
     } finally {
       setLoading(false);

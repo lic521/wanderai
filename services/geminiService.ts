@@ -52,9 +52,20 @@ const itinerarySchema: Schema = {
   required: ["tripTitle", "summary", "destination", "days", "packingTips"]
 };
 
+function cleanJsonString(text: string): string {
+  let cleanText = text.trim();
+  // Remove markdown code blocks if present
+  if (cleanText.startsWith("```json")) {
+    cleanText = cleanText.replace(/^```json/, "").replace(/```$/, "");
+  } else if (cleanText.startsWith("```")) {
+    cleanText = cleanText.replace(/^```/, "").replace(/```$/, "");
+  }
+  return cleanText.trim();
+}
+
 export const generateItinerary = async (input: TripInput): Promise<ItineraryData> => {
   if (!process.env.API_KEY) {
-    throw new Error("API Key is missing");
+    throw new Error("API Key is missing. Please check your environment configuration.");
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -89,9 +100,11 @@ export const generateItinerary = async (input: TripInput): Promise<ItineraryData
     const text = response.text;
     if (!text) throw new Error("No response from AI");
 
-    return JSON.parse(text) as ItineraryData;
-  } catch (error) {
+    const cleanedText = cleanJsonString(text);
+    return JSON.parse(cleanedText) as ItineraryData;
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
-    throw error;
+    // Re-throw with a more user-friendly message if possible, or the original error
+    throw new Error(error.message || "Failed to generate itinerary");
   }
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ItineraryData, Activity } from '../types';
-import { Calendar, MapPin, Clock, Wallet, Bus, Map as MapIcon, ArrowLeft, Navigation2 } from 'lucide-react';
+import { Calendar, MapPin, Clock, Wallet, Bus, Map as MapIcon, ArrowLeft, Navigation2, BedDouble } from 'lucide-react';
 
 interface ItineraryViewProps {
   data: ItineraryData;
@@ -152,10 +152,45 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ data, onUpdate }) 
               ) : (
                 // TRANSPORT MODE VIEW
                 <div className="space-y-6">
+                   {/* Hotel / Start Point */}
+                   {day.activities.length > 0 && (
+                     <div className="relative">
+                        <div className="absolute left-6 top-10 bottom-0 w-0.5 bg-blue-100"></div>
+                        
+                        <div className="flex items-center gap-3 mb-4 relative z-10">
+                           <div className="w-12 h-12 rounded-full bg-blue-50 border-2 border-blue-100 flex items-center justify-center shadow-sm text-blue-600 shrink-0">
+                              <BedDouble className="w-5 h-5" />
+                           </div>
+                           <div className="flex-1 min-w-0">
+                             <div className="text-base font-bold text-gray-900">酒店 / 出发点</div>
+                             <div className="text-xs text-gray-400">早晨出发</div>
+                           </div>
+                        </div>
+
+                        <div className="ml-6 pl-8 pb-8 relative">
+                            <div className="absolute left-0 top-0 -translate-x-1/2 mt-2 bg-blue-50 p-1.5 rounded-full border border-blue-100 text-blue-600">
+                              <Navigation2 className="w-4 h-4" />
+                            </div>
+                            <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 hover:border-blue-300 transition-all group cursor-text">
+                              <div className="text-xs font-bold text-blue-600 mb-1 uppercase tracking-wider flex items-center gap-1">
+                                前往第一站
+                              </div>
+                              <textarea 
+                                className="w-full bg-transparent text-sm text-gray-700 leading-relaxed outline-none resize-none"
+                                rows={2}
+                                value={day.activities[0].transport || ''}
+                                onChange={(e) => handleActivityChange(dayIndex, 0, 'transport', e.target.value)}
+                                placeholder="输入具体交通路线..."
+                              />
+                            </div>
+                        </div>
+                     </div>
+                   )}
+
                    {day.activities.map((act, actIndex) => (
                      <div key={actIndex} className="relative">
-                       {/* The Route Line */}
-                       {actIndex < day.activities.length && (
+                       {/* The Route Line (if not last) */}
+                       {actIndex < day.activities.length - 1 && (
                          <div className="absolute left-6 top-10 bottom-0 w-0.5 bg-blue-100"></div>
                        )}
 
@@ -170,7 +205,7 @@ export const ItineraryView: React.FC<ItineraryViewProps> = ({ data, onUpdate }) 
                          </div>
                        </div>
 
-                       {/* Transport Detail Card */}
+                       {/* Transport Detail Card (to next stop) */}
                        {actIndex < day.activities.length - 1 && (
                          <div className="ml-6 pl-8 pb-8 relative">
                             {/* Connection Icon */}
